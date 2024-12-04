@@ -1,0 +1,262 @@
+﻿@using Newtonsoft.Json;
+
+@{
+    ViewBag.Title = "Broker Recon";
+    string Source = BrokerRecon.Enums.IndicatorType.Source.ToString();
+    string Target = BrokerRecon.Enums.IndicatorType.Target.ToString();
+}
+
+<h2>Broker Recon</h2>
+
+<section class="container-fluid py-4 border mb-2">
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-5 g-4">
+        <!-- Info Section -->
+        <div class="col">
+            <div class="info" data-caption="Info">
+                @(Html.DevExtreme().TextBox()
+                        .ID("code")
+                        .InputAttr("aria-label", "Code")
+                        //.Placeholder("Enter Code")
+                        .Label("Code")
+                        .LabelMode(EditorLabelMode.Static)
+)
+                @(Html.DevExtreme().TextBox()
+                        .ID("name")
+                        .InputAttr("aria-label", "Name")
+                        //.Placeholder("Enter Name")
+                        .Label("Name")
+                        .LabelMode(EditorLabelMode.Static)
+)
+                @(Html.DevExtreme().TextArea()
+                         .ID("description")
+                         .InputAttr("aria-label", "Description")
+                         .Label("Description")
+                         .LabelMode(EditorLabelMode.Static)
+                         .Height(60)
+)
+            </div>
+        </div>
+
+        <!-- Source Section -->
+        <div class="col">
+            <div class="d-flex flex-column gap-3">
+                @Html.Partial("FileSection", Source)
+
+                @*@(Html.DevExtreme().SelectBox()
+                    .DataSource(d => d.Mvc().Controller("Info").LoadAction("GetTargetTable").Key("ID"))
+                    .DisplayExpr("ColumnName")
+                    .InputAttr("aria-label", "Column ID")
+                    .ValueExpr("ID")
+                    .Label("Target")
+                    .LabelMode(EditorLabelMode.Static)
+                    .Placeholder("Select Column")
+                    .Height(40)
+                )
+
+                @(Html.DevExtreme().SelectBox()
+                    .DataSource(d => d.Mvc().Controller("Info").LoadAction("GetSourceTable").Key("ID"))
+                    .DisplayExpr("ColumnName")
+                    .InputAttr("aria-label", "Column ID")
+                    .ValueExpr("ID")
+                    .Label("Source")
+                    .LabelMode(EditorLabelMode.Static)
+                    .Placeholder("Select Column")
+                    .Height(40)
+                )*@
+            </div>
+
+        </div>
+
+        <!-- Target Section -->
+        <div class="col">
+            @Html.Partial("FileSection", Target)
+        </div>
+
+        @*Color section*@
+        <div class="col">
+            @Html.Partial("ColorSection")
+        </div>
+
+        @*<div class="col"  style="width: fit-content">*@
+        <div class="col">
+            <div class="container justify-content-end">
+                <div class="d-flex flex-column gap-3 align-items-end">
+                    @(Html.DevExtreme().Button()
+                    .ID("save_btn")
+                    .OnClick("onSaveClick")
+                    .Icon("save")
+                    .Width("fit-content")
+                    .Hint("Save")
+                    .StylingMode(ButtonStylingMode.Contained)
+            )
+                    @(Html.DevExtreme().Button()
+                    .ID("save_close_btn")
+                    .Icon("square")
+                    .Width("fit-content")
+                    .Hint("Save and Close")
+                    .StylingMode(ButtonStylingMode.Contained)
+                    .Type(ButtonType.Normal)
+            )
+                    @(Html.DevExtreme().Button()
+                    .ID("clear_btn")
+                    .Icon("clearformat")
+                    .Width("fit-content")
+                    .Hint("Clear")
+                    .StylingMode(ButtonStylingMode.Contained)
+                    .Type(ButtonType.Normal)
+            )
+                    @(Html.DevExtreme().Button()
+                    .ID("close_btn")
+                    .Icon("clear")
+                    .Width("fit-content")
+                    .Hint("Close")
+                    .StylingMode(ButtonStylingMode.Contained)
+            )
+                </div>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+
+<section class="container-fluid py-4 mb-5">
+    <div class="row">
+        <div class="p-0 col-lg-4">
+            @(Html.DevExtreme().DataGrid<BrokerRecon.Models.ColumnObjModel>()
+                .DataSource(d => d.Mvc()
+                                    .Controller("Info")
+                                    .LoadAction("GetSourceTable")
+                                    .Key("ID")
+                )
+                .ID("sourceGridContainer")
+                .ShowBorders(true)
+                .ShowColumnLines(true)
+                .ColumnAutoWidth(true)
+                .ShowRowLines(true)
+                .Columns(column =>
+                {
+                    column.Add()
+                    .Caption("Source Details")
+                    .HeaderCellTemplate(@"<div style='font-weight: bold;'>Source Details</div>")
+                    .Alignment(HorizontalAlignment.Center)
+                    .Columns(c =>
+                    {
+                        c.AddFor(m => m.ColumnName)
+                        .Caption("Column Name")
+                        .HeaderCellTemplate(@"<div style='font-weight: bold;'>Column Name</div>");
+
+                        c.AddFor(m => m.DataType).Caption("Data Type");
+                        c.Add().Caption("Expression");
+
+                        c.AddFor(m => m.Value).Caption("Sample Value");
+                    });
+                })
+                .OnRowClick("rowClickFunc")
+                .OnCellClick("cellClickFunc")
+                )
+        </div>
+
+            <div class="p-0 col-lg-4">
+                @(Html.DevExtreme().DataGrid<BrokerRecon.Models.ColumnObjModel>()
+                    .DataSource(d => d.Mvc()
+                                        .Controller("Info")
+                                        .LoadAction("GetTargetTable")
+                                        .Key("ID")
+                    )
+                    .Toolbar(t => t.Visible(false))
+                    .ID("targetGridContainer")
+                    .ShowBorders(true)
+                    .ShowColumnLines(true)
+                    .ColumnAutoWidth(true)
+                    .ShowRowLines(true)
+                    .Editing(e =>
+                    {
+                        e.Mode(GridEditMode.Batch);
+                        e.AllowAdding(true);
+                        e.AllowUpdating(true);
+                        //e.AllowDeleting(true);
+                        e.SelectTextOnEditStart(true);
+                        e.StartEditAction(GridStartEditAction.Click);
+                    })
+                    .Columns(column =>
+                    {
+                        column.Add()
+                        .Caption("Target Details")
+                        .HeaderCellTemplate(@"<div style='font-weight: bold;'>Target Details</div>")
+                        .Alignment(HorizontalAlignment.Center)
+                        .Columns(c =>
+                        {
+                            c.AddFor(m => m.ColumnName)
+                            //.Lookup(l => l
+                            //             .DataSource(d => d.Mvc().Controller("Info").LoadAction("GetTargetList"))
+
+                            //)
+                            .Caption("Column Name")
+                            .HeaderCellTemplate(@"<div style='font-weight: bold;'>Column Name</div>")
+                            .EditCellTemplate(new JS("editCellTemplate"))
+                            .CellTemplate(new JS("targetCellTemplate"))
+                            
+                            ;
+
+
+                            c.AddFor(m => m.DataType).Caption("Data Type").CellTemplate(new JS("targetCellTemplate"));
+                            c.Add().Caption("Expression");
+                            c.AddFor(m => m.Value).Caption("Sample Value").CellTemplate(new JS("targetCellTemplate"));
+                        });
+
+                    })
+                    .OnRowUpdated("rowUp")
+                    
+                    //.OnEditorPreparing("onEditorPrepared")
+                    )
+            </div>
+
+        <div class="p-0 col-lg-4">
+            @(Html.DevExtreme().DataGrid()
+                .DataSource(new JS("datasource_lower_table"))
+                .ID("gridContainer3")
+                .ShowBorders(true)
+                .ShowColumnLines(true)
+                .ColumnAutoWidth(true)
+                .ShowRowLines(true)
+                .Columns(column =>
+                {
+                    column.Add()
+                    .Caption("Match Rule")
+                    .HeaderCellTemplate(@"<div style='font-weight: bold;'>Match Rule</div>")
+                    .Alignment(HorizontalAlignment.Center)
+                    .Columns(c =>
+                    {
+                        c.Add()
+                        .Caption("Match Rule")
+                        .HeaderCellTemplate(@"<div style='font-weight: bold;'>Match Rule</div>");
+                        c.Add().Caption("Summary");
+                        c.Add().Caption("Match Tol(+-)%");
+                        c.Add().Caption("Match Warning");
+                    });
+                }))
+        </div>
+    </div>
+</section>
+
+
+
+<script src="~/Scripts/BrokerRecon/Script1.js"></script>
+
+
+<script>
+    const datasource_lower_table = [];
+
+    function rowUp(e) {
+        console.log(e);
+    }
+
+    function rowClickFunc(e) {
+        console.log("rowclick", e);
+    }
+
+    function cellClickFunc(e) {
+        console.log("cellclick", e);
+    }
+</script>

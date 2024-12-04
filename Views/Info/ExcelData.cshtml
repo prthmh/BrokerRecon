@@ -1,0 +1,29 @@
+﻿
+@{
+    ViewBag.Title = "Excel DAta";
+}
+
+@*@(Html.DevExtreme().DataGrid()
+                           .ID("InfoGrid")
+                           .DataSource()
+    )*@
+@(Html.DevExtreme().DataGrid<BrokerRecon.Models.Student>()
+                    .ID("InfoGrid")
+                    .ShowBorders(true)
+                    .WordWrapEnabled(true)
+                    .ShowRowLines(true)
+                    .AllowColumnResizing(false)
+                    .AllowColumnReordering(false)
+                    .Columns(c =>
+                    {
+
+                        c.AddFor(m => m.Name);
+                        c.AddFor(m => m.Age);
+                    })
+                    .DataSource(d => d
+                            .Mvc()
+                            .Controller("Info")
+                            .LoadAction("GetSavedExcelTable")
+                    //.Key("ID")
+                    )
+     )

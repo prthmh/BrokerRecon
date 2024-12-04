@@ -1,0 +1,44 @@
+﻿@model BrokerRecon.Models.InfoModel
+
+@{
+    ViewBag.Title = "Info Management";
+}
+
+
+
+
+@(Html.DevExtreme().DataGrid<BrokerRecon.Models.InfoModel>()
+                    .ID("InfoGrid")
+                    .ShowBorders(true)
+                    .WordWrapEnabled(true)
+                    .ShowRowLines(true)
+                    .AllowColumnResizing(false)
+                    .AllowColumnReordering(false)
+                    .Columns(c =>
+                    {
+                        c.AddFor(m => m.ID).Width(40);
+                        c.AddFor(m => m.Code).Width(60);
+                        c.AddFor(m => m.Name);
+                        c.AddFor(m => m.Description);
+                        c.AddFor(m => m.Match).Width(100).CellTemplate(new JS("cellTemplate"));
+                        c.AddFor(m => m.Warning).Width(100).CellTemplate(new JS("cellTemplate"));
+                        c.AddFor(m => m.MisMatch).Width(100).CellTemplate(new JS("cellTemplate"));
+
+                        c.Add().Caption("Source File").CalculateCellValue("calSourceCell");
+                        c.Add().Caption("Target File").CalculateCellValue("calTargetCell");
+                    })
+                    .DataSource(d => d
+                            .Mvc()
+                            .Controller("Info")
+                            .LoadAction("Get")
+                            .Key("ID")
+                    )
+                     .StateStoring(s => s
+                        .Enabled(true)
+                        .Type(StateStoringType.SessionStorage)
+                        .StorageKey("storage")
+                    )
+     )
+
+    <script src="~/Scripts/BrokerRecon/Script1.js"></script>
+

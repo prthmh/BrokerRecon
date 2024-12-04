@@ -1,0 +1,28 @@
+﻿@model string
+
+<div class="source static-section-label" data-caption="@(Model)">
+    @(Html.DevExtreme().SelectBox()
+                        .ID(Model)
+                        .InputAttr("aria-label", "File Adaptor")
+                        .DataSource(new[] {"ER Report", "Excel File" })
+                        .Label("File Adaptor")
+                        .LabelMode(EditorLabelMode.Static)
+                        .Placeholder("Select File Adaptor")
+                        .Height(40)
+                        .OnValueChanged("function(e) { fileAdaptorValueChange(e, '" + Model + "'); }")
+)
+
+    @if (Model == "Source")
+    {
+        <div id="file_input">
+            @(Html.DevExtreme().TextBox())
+        </div>
+    }
+    else
+    {
+        <div id="file_input_target">
+            @(Html.DevExtreme().TextBox())
+        </div>
+    }
+
+</div>
